@@ -3,7 +3,7 @@
 The product target is a **portable company agent**: one independent deployment
 per company, with company-owned identity, Slack/GitHub connections, subscription
 authentication, and configurable workflows. See [the product contract](PRODUCT.md)
-for the ParkTab onboarding target, PR review integration, optional Tart workers,
+for the generic corporation onboarding target, PR review integration, optional Tart workers,
 and acceptance criteria. The capabilities below describe the current starter.
 
 **Start with [the company setup checklist](ONBOARDING.md).**

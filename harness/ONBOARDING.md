@@ -32,7 +32,7 @@ or passwords in YAML, even though the file is private.
 | 6. Workers      | Named HTTPS Mac endpoint and allowed recipes                                 | Optional native macOS tool execution                              |
 | 7. Workflows    | Enablement, preset, channel, access group, model profile, trigger            | The jobs that are actually generated and provisioned              |
 
-For ParkTab, change `company.id`, `company.name`, and `company.agentName`, then
+For your corporation, change `company.id`, `company.name`, and `company.agentName`, then
 replace the example Slack IDs. Keep the company context specific to your own
 products: a provider swap does not translate another company's event names or
 definitions of conversion, activation, revenue, and retention.

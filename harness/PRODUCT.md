@@ -3,7 +3,7 @@
 ## Deliverable
 
 An agent a company can provision under its own identity, connect to Slack and
-GitHub, and operate on its own infrastructure. ParkTab is the reference example;
+GitHub, and operate on its own infrastructure. A generic corporation is the reference example;
 the same release must work for another company through configuration and company
 content, without source edits or access to another company’s systems.
 
@@ -174,7 +174,7 @@ external account creation remain explicit operator steps.
 
 A release is ready for this deliverable when a fresh installation can:
 
-1. Configure ParkTab's name and identity without editing source or borrowing
+1. Configure a corporation’s name and identity without editing source or borrowing
    another company’s credentials, prompts, or infrastructure.
 2. Answer an authorized Slack mention and continue in its thread after restart.
 3. Review a configured private GitHub PR, return findings, and publish under the
