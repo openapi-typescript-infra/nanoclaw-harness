@@ -1,8 +1,18 @@
-# Local Slack job harness
+# Company agent infrastructure
 
-This checkout includes the Codex/Slack job harness. Start with
-[harness/README.md](harness/README.md) for container deployment, trigger
-definitions, subscription identities, and the native macOS worker.
+This project adds independently deployed company agents and shared Mac worker
+infrastructure on top of NanoClaw. Start with the infrastructure documentation:
+
+- **[Infrastructure overview and deployment](harness/README.md)** — architecture,
+  containers, workflows, model authentication, and Linux/macOS execution.
+- **[Company setup checklist](harness/ONBOARDING.md)** — the “put your specifics
+  here” configuration and setup commands.
+- **[Shared Mac host integration](harness/HOST-API.md)** — sibling VMs, company
+  isolation, leases, and the separately released host service.
+- **[Product scope and implementation status](harness/PRODUCT.md)** — requirements,
+  capabilities, and remaining work.
+
+The original NanoClaw README follows below for upstream runtime documentation.
 
 ---
 
