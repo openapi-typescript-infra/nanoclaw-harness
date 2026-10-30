@@ -1,0 +1,33 @@
+{
+  "version": 1,
+  "executionIdentity": "team-operator",
+  "owner": "U00000001",
+  "timezone": "America/New_York",
+  "jobs": [
+    {
+      "id": "incident",
+      "playbook": "incident.md",
+      "skills": ["incident-triage"],
+      "members": ["U00000001"],
+      "triggers": [{ "kind": "mention", "channel": "C00000001" }],
+      "sink": { "kind": "thread" }
+    },
+    {
+      "id": "daily-health",
+      "playbook": "daily-health.md",
+      "skills": ["incident-triage"],
+      "members": ["U00000001"],
+      "triggers": [{ "kind": "schedule", "cron": "0 8 * * 1-5" }],
+      "sink": { "kind": "channel", "channel": "C00000002" }
+    },
+    {
+      "id": "ios-check",
+      "playbook": "ios-check.md",
+      "skills": ["macos-checks"],
+      "members": ["U00000001"],
+      "triggers": [{ "kind": "pattern", "channel": "C00000003", "pattern": "^ios-check(?:\\s|$)" }],
+      "sink": { "kind": "thread" },
+      "macos": { "url": "https://mac-worker.example.com/", "recipes": ["simulators", "ios-tests"] }
+    }
+  ]
+}

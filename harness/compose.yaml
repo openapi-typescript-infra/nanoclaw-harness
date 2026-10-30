@@ -1,0 +1,28 @@
+name: ${COMPOSE_PROJECT_NAME:-nanoclaw-harness}
+services:
+  coordinator:
+    image: nanoclaw-harness:local
+    build:
+      context: ..
+      dockerfile: harness/Dockerfile
+      args:
+        PROJECT_ROOT: ${NANOCLAW_ROOT:-/opt/nanoclaw}
+    working_dir: ${NANOCLAW_ROOT:-/opt/nanoclaw}
+    restart: unless-stopped
+    environment:
+      DEFAULT_AGENT_PROVIDER: codex
+      NANOCLAW_GATEWAY_PROVIDER: onecli
+      NANOCLAW_TEMPLATES_DIR: ${NANOCLAW_ROOT:-/opt/nanoclaw}/harness/generated/templates
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ${NANOCLAW_ROOT:-/opt/nanoclaw}/.env:${NANOCLAW_ROOT:-/opt/nanoclaw}/.env:ro
+      - ${NANOCLAW_ROOT:-/opt/nanoclaw}/data:${NANOCLAW_ROOT:-/opt/nanoclaw}/data
+      - ${NANOCLAW_ROOT:-/opt/nanoclaw}/groups:${NANOCLAW_ROOT:-/opt/nanoclaw}/groups
+      - ${NANOCLAW_ROOT:-/opt/nanoclaw}/logs:${NANOCLAW_ROOT:-/opt/nanoclaw}/logs
+      - ${NANOCLAW_ROOT:-/opt/nanoclaw}/store:${NANOCLAW_ROOT:-/opt/nanoclaw}/store
+      - ${NANOCLAW_ROOT:-/opt/nanoclaw}/harness/generated:${NANOCLAW_ROOT:-/opt/nanoclaw}/harness/generated:ro
+      - ${NANOCLAW_ROOT:-/opt/nanoclaw}/container:${NANOCLAW_ROOT:-/opt/nanoclaw}/container:ro
+    # Socket Mode needs no public listener port. OneCLI runs separately and
+    # must be reachable from this container and the agent network.

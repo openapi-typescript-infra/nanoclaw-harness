@@ -1,0 +1,7 @@
+{
+  "repository": "https://github.com/nanocoai/nanoclaw",
+  "main": "acc2b1c8f52a954368cfaf04b61c32f9a1efc280",
+  "channels": "bf7e18226efaad2c083ca9cfa7faf8db76e082bf",
+  "codexCli": "0.162.1",
+  "gateway": "onecli 1.45.0"
+}

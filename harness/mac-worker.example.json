@@ -1,0 +1,14 @@
+{
+  "recipes": {
+    "simulators": {
+      "cwd": "/tmp",
+      "argv": ["/usr/bin/xcrun", "simctl", "list", "devices", "available", "--json"],
+      "timeoutMs": 30000
+    },
+    "ios-tests": {
+      "cwd": "/Users/runner/work/mobile-app",
+      "argv": ["/usr/bin/xcodebuild", "test", "-workspace", "App.xcworkspace", "-scheme", "App", "-destination", "platform=iOS Simulator,name=iPhone 17"],
+      "timeoutMs": 1200000
+    }
+  }
+}

@@ -1,0 +1,96 @@
+# Copy with `pnpm run company:init`, then fill in this file from top to bottom.
+# No tokens/passwords here. Store credentials in .env / the credential gateway.
+version: 1
+
+# 1. Identity and business context. This text reaches each enabled workflow.
+company:
+  id: your-company
+  name: Your Company
+  agentName: Company Assistant
+  timezone: America/New_York
+  context: |
+    Describe the business, products, and terminology here.
+    Define important metrics and event names, e.g. what counts as activation.
+    Do not put credentials or confidential customer records in these instructions.
+
+# 2. Dedicated Linux VM checkout path. Generated Compose settings use this path.
+deployment:
+  root: /opt/company-agent
+
+# 3. Put IDs here once; workflows refer to their logical names below.
+slack:
+  owner: operator
+  users:
+    operator: U00000000 # Replace with your Slack member ID.
+    # colleague: U012345678
+  channels:
+    engineering: C00000000 # Replace with the channel where the agent should work.
+    reports: C00000000 # Only required when a report workflow is enabled.
+  access:
+    team: [operator] # Add named users explicitly; no workspace-wide default.
+
+# 4. Model choices. null means use the runtime default, not a model named 'null'.
+# The active account is an audit binding to the login set up on THIS installation.
+# Additional accounts may be inventoried, but routing to them is not implemented.
+execution:
+  activeAccount: primary
+  accounts:
+    primary: { provider: codex, auth: subscription }
+    # reviewer: { provider: codex, auth: subscription }
+  profiles:
+    standard: { account: primary, model: null, effort: null }
+    deep: { account: primary, model: null, effort: high }
+
+# 5. Optional integration inventory. These connectors are not implemented yet.
+# Pick posthog OR mixpanel for analytics. 'resources' maps your logical names to
+# service IDs, repo names, etc.; credentialRef names a future vault binding.
+# Listing an integration does not connect it or grant jobs access to it.
+integrations:
+  analytics:
+    provider: posthog # Alternatives: mixpanel; see company-catalog.ts for all providers.
+    endpoint: null # HTTPS origin for your region or self-hosted instance.
+    resources: {} # e.g. production: 'your-project-id'
+    credentialRef: null # A secret reference, NEVER the token itself.
+  source:
+    provider: github
+    endpoint: null
+    resources: {} # e.g. app: 'your-org/your-repo'
+    credentialRef: null
+
+# 6. Optional native Mac endpoint; this does not provision a Tart VM.
+workers: {}
+# workers:
+#   mobile:
+#     url: https://mac-worker.example.com/
+#     recipes: [simulators, ios-tests]
+#     hostProfile: ios # Uses the separate shared host API v1; omit for a standalone worker.
+
+# 7. Enable workflows and bind names from above. All members inherit the selected
+# access list; model profiles and integrations are explicitly selected per job.
+# Integration-backed / GitHub jobs fail the check until their adapters exist.
+workflows:
+  chat:
+    enabled: true
+    preset: conversation
+    access: team
+    profile: standard
+    integrations: []
+    channel: engineering
+    trigger: { kind: mention }
+  health:
+    enabled: false
+    preset: daily-health
+    access: team
+    profile: standard
+    integrations: []
+    channel: reports
+    trigger: { kind: schedule, cron: '0 8 * * 1-5' }
+  review:
+    enabled: false
+    preset: pr-review
+    access: team
+    profile: deep
+    integrations: [source]
+    channel: engineering
+    trigger: { kind: pattern, pattern: '^review(?:\s|$)' }
+# Add an ios-check workflow with worker: mobile after configuring the endpoint.
