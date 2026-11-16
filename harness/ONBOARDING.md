@@ -58,8 +58,9 @@ effort compatibility require a live authenticated runtime.
 | Company instructions and agent name                                    | Included in templates and the generated Slack manifest                    |
 | Codex profiles on one account                                          | Applied as native group model/effort settings                             |
 | Native Mac recipes                                                     | Use the existing MCP worker; endpoint/auth setup is separate              |
-| PostHog, Mixpanel, Sentry, Jira, Linear, BigQuery, GitHub connectors   | Inventory only; blocked if required by an enabled workflow                |
-| PR review / implement-change presets                                   | Planned; blocked when enabled                                             |
+| GitHub PR review                                                        | Reads allowlisted PR metadata and patches; optionally posts one comment when requested |
+| PostHog, Mixpanel, Sentry, Jira, Linear, BigQuery connectors            | Inventory only; blocked if required by an enabled workflow                |
+| Implement-change preset                                                 | Planned; blocked when enabled                                             |
 | Multiple subscription routing, Claude executor, per-step model changes | Planned; not enabled by listing accounts/profiles                         |
 | Tart VM creation / GitHub Actions dispatch                             | Planned; a worker URL does not create a VM                                |
 

@@ -187,6 +187,17 @@ export function validateCompany(input: unknown): Company {
     if (integration.endpoint !== null) origin(integration.endpoint, `integrations.${name}.endpoint`);
     namedMap(integration.resources, `integrations.${name}.resources`);
     for (const value of Object.values(integration.resources)) text(value, `integrations.${name}.resources`);
+    if (integration.provider === 'github') {
+      const repositories = Object.values(integration.resources);
+      requireValue(
+        repositories.every((repository) => /^[A-Za-z0-9][A-Za-z0-9_.-]*\/[A-Za-z0-9][A-Za-z0-9_.-]*$/.test(repository)),
+        `integrations.${name}.resources: GitHub resources must be owner/repository names`,
+      );
+      requireValue(
+        new Set(repositories.map((repository) => repository.toLowerCase())).size === repositories.length,
+        `integrations.${name}.resources: duplicate GitHub repositories`,
+      );
+    }
     if (integration.credentialRef !== null) slug(integration.credentialRef, `integrations.${name}.credentialRef`);
   }
   namedMap(c.workers, 'workers');
@@ -299,7 +310,14 @@ export function inspectCompany(c: Company): Check[] {
           `${loc}.integrations`,
           `Connector ${name} (${integration.provider}) is not implemented; it cannot be enabled by configuration alone`,
         );
+      if (integration.provider === 'github' && job.preset !== 'pr-review')
+        add('error', `${loc}.integrations`, 'GitHub source access is only available to the read-only PR review workflow');
     }
+    if (
+      job.preset === 'pr-review' &&
+      !job.integrations.some((name) => c.integrations[name].provider === 'github' && Object.keys(c.integrations[name].resources).length)
+    )
+      add('error', `${loc}.integrations`, 'PR review requires at least one configured GitHub repository');
     if (job.worker && /(^|\.)example\.com$/.test(new URL(c.workers[job.worker].url).hostname))
       add('error', `workers.${job.worker}.url`, 'Replace the example worker hostname');
   }
@@ -311,7 +329,9 @@ export function inspectCompany(c: Company): Check[] {
     add(
       'note',
       `integrations.${name}`,
-      `${integration.provider}: configuration inventory only; no connector installed or credentials verified`,
+      integration.provider === 'github'
+        ? 'github: PR review/comment adapter configured; API access still requires live credential verification'
+        : `${integration.provider}: configuration inventory only; no connector installed or credentials verified`,
     );
   add(
     'note',
@@ -344,6 +364,15 @@ export function resolveCompany(c: Company): Config {
         triggers: [job.trigger.kind === 'schedule' ? job.trigger : { ...job.trigger, channel }],
         sink: job.trigger.kind === 'schedule' ? { kind: 'channel', channel } : { kind: 'thread' },
         ...(job.worker ? { macos: c.workers[job.worker] } : {}),
+        ...(job.preset === 'pr-review'
+          ? {
+              githubReview: {
+                repositories: job.integrations.flatMap((name) =>
+                  c.integrations[name].provider === 'github' ? Object.values(c.integrations[name].resources) : [],
+                ),
+              },
+            }
+          : {}),
       };
     });
   return validateConfig({

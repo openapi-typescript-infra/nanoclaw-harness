@@ -41,7 +41,8 @@ execution:
     standard: { account: primary, model: null, effort: null }
     deep: { account: primary, model: null, effort: high }
 
-# 5. Optional integration inventory. These connectors are not implemented yet.
+# 5. Optional integrations. GitHub is restricted to explicitly allowlisted
+# repositories and available only to the PR review workflow.
 # Pick posthog OR mixpanel for analytics. 'resources' maps your logical names to
 # service IDs, repo names, etc.; credentialRef names a future vault binding.
 # Listing an integration does not connect it or grant jobs access to it.
@@ -54,7 +55,7 @@ integrations:
   source:
     provider: github
     endpoint: null
-    resources: {} # e.g. app: 'your-org/your-repo'
+    resources: {} # e.g. app: 'your-org/your-repo'; PR review tools use these repos.
     credentialRef: null
 
 # 6. Optional native Mac endpoint; this does not provision a Tart VM.

@@ -41,8 +41,15 @@ function ncl(command: string[], args: Record<string, unknown> = {}) {
 }
 // The daemon must use the same library; setting the CLI's env alone cannot change it.
 const templates = ncl(['templates', 'list']);
-if (!JSON.stringify(templates).includes('harness-'))
-  throw new Error('Start the daemon with NANOCLAW_TEMPLATES_DIR pointing at harness/generated/templates');
+const templateRefs = new Set(
+  (Array.isArray(templates) ? templates : []).map((template: { ref?: string }) => template.ref),
+);
+const missingTemplates = config.jobs.filter((job) => !templateRefs.has(job.id));
+if (missingTemplates.length)
+  throw new Error(
+    `Daemon is missing templates ${missingTemplates.map((job) => job.id).join(', ')}; ` +
+      'start it with NANOCLAW_TEMPLATES_DIR pointing at harness/generated/templates',
+  );
 const user = (id: string) => ncl(['users', 'create'], { id: `slack:${id}`, kind: 'slack' });
 user(config.owner);
 ncl(['roles', 'grant'], { user: `slack:${config.owner}`, role: 'owner' });

@@ -83,7 +83,13 @@ test('onboarding refuses unsupported active integrations, accounts and workflows
   assert.throws(() => resolveCompany(c), /Multiple-account routing/);
   c.workflows.chat.profile = 'standard';
   c.workflows.review.enabled = true;
-  assert.throws(() => resolveCompany(c), /PR review integration/);
+  assert.throws(() => resolveCompany(c), /Multiple-account routing/);
+  c.execution.profiles.deep.account = 'primary';
+  assert.throws(() => resolveCompany(c), /PR review requires at least one configured GitHub repository/);
+  c.integrations.source.resources = { app: 'example-org/example-app' };
+  assert.deepEqual(resolveCompany(c).jobs.find((job) => job.id === 'review')?.githubReview, {
+    repositories: ['example-org/example-app'],
+  });
   c.workflows.review.enabled = false;
   c.execution.accounts.primary.provider = 'claude';
   assert.throws(() => resolveCompany(c), /only provisions Codex/);

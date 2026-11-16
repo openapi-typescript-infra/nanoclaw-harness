@@ -20,6 +20,7 @@ export interface Job {
   )[];
   sink: { kind: 'thread' } | { kind: 'channel'; channel: string };
   macos?: { url: string; recipes: string[]; hostProfile?: string };
+  githubReview?: { repositories: string[] };
 }
 export interface Config {
   version: 1;
@@ -95,7 +96,7 @@ export function validateConfig(input: unknown): Config {
   const ids = new Set<string>();
   const bindings = new Set<string>();
   for (const j of c.jobs) {
-    keys(j, ['id', 'inference', 'playbook', 'skills', 'members', 'triggers', 'sink', 'macos']);
+    keys(j, ['id', 'inference', 'playbook', 'skills', 'members', 'triggers', 'sink', 'macos', 'githubReview']);
     if (j.inference !== undefined) validateInference(j.inference);
     ensure(typeof j.id === 'string' && slug.test(j.id) && !ids.has(j.id), 'Invalid or duplicate job ID');
     ids.add(j.id);
@@ -146,6 +147,23 @@ export function validateConfig(input: unknown): Config {
         'Invalid macOS recipes',
       );
     }
+    if (j.githubReview) {
+      keys(j.githubReview, ['repositories']);
+      ensure(j.playbook === 'pr-review.md', `${j.id}: GitHub review access is only supported by pr-review`);
+      ensure(
+        Array.isArray(j.githubReview.repositories) &&
+          j.githubReview.repositories.length > 0 &&
+          j.githubReview.repositories.every((repo) =>
+            typeof repo === 'string' && /^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/.test(repo),
+          ),
+        `${j.id}: invalid GitHub repository allowlist`,
+      );
+      ensure(
+        new Set(j.githubReview.repositories.map((repo) => repo.toLowerCase())).size ===
+          j.githubReview.repositories.length,
+        `${j.id}: duplicate GitHub repository allowlist entries`,
+      );
+    } else ensure(j.playbook !== 'pr-review.md', `${j.id}: PR review requires a GitHub repository allowlist`);
   }
   return c;
 }

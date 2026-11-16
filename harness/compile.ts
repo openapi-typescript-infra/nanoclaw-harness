@@ -45,36 +45,37 @@ export function compile(config: Config, root: string, output: string) {
           `---\nschedule: ${JSON.stringify(trigger.cron)}\n---\nRun the ${job.id} playbook with current evidence. ${sink}\n`,
         );
       }
+    const mcpServers: Record<string, unknown> = {};
     if (job.macos) {
       put(
         'mac-client.mjs',
         fs.readFileSync(path.join(root, job.macos.hostProfile ? 'host-client.mjs' : 'mac-client.mjs')),
       );
-      put(
-        'mcp.json',
-        JSON.stringify(
-          {
-            $schema: 'https://agent-plugins.org/schemas/1.0.0/mcp.schema.json',
-            mcpServers: {
-              macos: {
-                type: 'stdio',
-                command: 'node',
-                args: ['${PLUGIN_ROOT}/mac-client.mjs'],
-                env: {
-                  MAC_WORKER_URL: job.macos.url,
-                  MAC_WORKER_RECIPES: JSON.stringify(job.macos.recipes),
-                  MAC_WORKER_TOKEN: 'placeholder',
-                  NODE_USE_ENV_PROXY: '1',
-                  ...(job.macos.hostProfile ? { MAC_HOST_PROFILE: job.macos.hostProfile } : {}),
-                },
-              },
-            },
-          },
-          null,
-          2,
-        ),
-      );
+      mcpServers.macos = {
+        type: 'stdio',
+        command: 'node',
+        args: ['${PLUGIN_ROOT}/mac-client.mjs'],
+        env: {
+          MAC_WORKER_URL: job.macos.url,
+          MAC_WORKER_RECIPES: JSON.stringify(job.macos.recipes),
+          MAC_WORKER_TOKEN: 'placeholder',
+          NODE_USE_ENV_PROXY: '1',
+          ...(job.macos.hostProfile ? { MAC_HOST_PROFILE: job.macos.hostProfile } : {}),
+        },
+      };
     }
+    if (job.githubReview)
+      mcpServers.github_pr_review = {
+        type: 'stdio',
+        command: 'node',
+        args: ['${PLUGIN_ROOT}/skills/github-pr-review/server.mjs'],
+        env: {
+          GITHUB_ALLOWED_REPOSITORIES: job.githubReview.repositories.join(','),
+          NODE_USE_ENV_PROXY: '1',
+        },
+      };
+    if (Object.keys(mcpServers).length)
+      put('mcp.json', JSON.stringify({ $schema: 'https://agent-plugins.org/schemas/1.0.0/mcp.schema.json', mcpServers }, null, 2));
   }
   // Build into a sibling directory and validate using NanoClaw's own reader
   // before replacing generated templates. Hand-authored inputs live elsewhere.
