@@ -25,10 +25,10 @@ export const workflowCatalog = {
     description: 'Native Mac recipe worker (not Tart provisioning)',
   },
   'pr-review': {
-    available: false,
-    playbook: '',
-    skills: [] as string[],
-    description: 'PR review integration is not implemented',
+    available: true,
+    playbook: 'pr-review.md',
+    skills: ['github-pr-review'],
+    description: 'GitHub pull request review delivered to Slack; optional explicit PR comment',
   },
   'implement-change': {
     available: false,
@@ -46,5 +46,5 @@ export const integrationCatalog = {
   jira: { capability: 'issue-tracking', available: false },
   linear: { capability: 'issue-tracking', available: false },
   bigquery: { capability: 'warehouse', available: false },
-  github: { capability: 'source-control', available: false },
+  github: { capability: 'source-control', available: true },
 } as const;

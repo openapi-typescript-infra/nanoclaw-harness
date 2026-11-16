@@ -536,6 +536,15 @@ export function renderCodexConfigToml(plan: CodexConfigPlan): string {
     }
 
     lines.push(`command = ${tomlBasicString(config.command)}`);
+    // The GitHub review server uses the session's HTTPS gateway.
+    // Pass the variable name so its value stays out of config.toml.
+    if (
+      name === 'github_pr_review' &&
+      config.command === 'node' &&
+      config.args?.[0] === '/workspace/agent/plugins/harness-review/skills/github-pr-review/server.mjs'
+    ) {
+      lines.push('env_vars = ["HTTPS_PROXY"]');
+    }
     // Codex launches the stdio server in this directory natively (Stdio
     // transport `cwd`, present since before the pinned 0.138.0). Arrives
     // absolute — plugin-mcp.ts resolves the plugin fixed forms first.

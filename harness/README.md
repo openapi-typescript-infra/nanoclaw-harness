@@ -68,6 +68,36 @@ flowchart LR
   MCP client runs in the Linux agent. The worker authenticates requests, limits
   output and duration, rejects unknown recipes/extra arguments, and runs one
   recipe at a time. It accepts no agent-supplied shell commands or file paths.
+- PR review accepts `review <GitHub PR URL>` or `@Grover review <GitHub PR URL>`
+  in the configured Slack channel and returns findings in the Slack
+  thread. Add `--post` to explicitly publish one top-level PR conversation
+  comment. The GitHub MCP adapter is restricted to repositories listed in that
+  company's `integrations.source.resources`; it cannot approve, request changes,
+  edit/delete comments, or write repository contents. Private repository access
+  needs a OneCLI GitHub App connection for `api.github.com` with repository
+  Contents read, Pull requests read, and Issues write. Issues write is the
+  GitHub permission accepted for creating PR conversation comments; the adapter
+  exposes only that comment action. Install the app only on the allowlisted
+  repositories and attach the connection to each review group. The reviewer
+  follows file and patch pagination and reports a blocker if it cannot cover
+  the whole PR.
+
+This local deployment does not receive GitHub webhooks, so GitHub's native
+review-request and PR-comment events do not start reviews automatically. Use the
+Slack `review <GitHub PR URL>` command (or mention Grover before it), adding
+`--post` when you want a PR comment.
+Automatic GitHub event triggers need a reachable webhook endpoint or a separate
+polling worker.
+
+For self-hosted OneCLI, use a custom GitHub App connection rather than a broad
+personal OAuth connection. Set its Setup URL to
+`https://<onecli-dashboard-host>/api/apps/github-app/callback`, enable
+“Redirect on update,” and leave webhooks inactive. Request only repository
+Contents read, Pull requests read, and Issues write (plus GitHub's required
+Metadata read). Install it only on the repositories the review group needs. OneCLI
+refreshes the installation token; attach the GitHub connection to each review
+group, not the general chat group. An organization owner may need to approve
+the app installation.
 
 This is a small declarative layer over NanoClaw, not a durable multi-step DAG
 engine. Playbooks guide agent steps; schedules and conversation persistence are

@@ -14,8 +14,9 @@ runtime state. Start with a dedicated Linux VM per company. An optional Apple
 Silicon host supplies macOS workers.
 
 This document describes the target product. The offline company onboarding
-configuration is implemented; live account setup, GitHub review integration,
-and Tart lifecycle still need implementation and verification as described below.
+configuration and GitHub PR review with optional comments are implemented; live account setup,
+private-repository gateway access, and Tart lifecycle still need verification as
+described below.
 
 ## What the operator supplies
 
@@ -196,15 +197,16 @@ A release is ready for this deliverable when a fresh installation can:
 The current starter has a central company YAML, an offline fill-in checklist,
 named access groups/channels/model profiles, company context, and generation of
 Slack manifests and deployment settings. It resolves enabled workflows into
-declarative Slack jobs and provisions them through NanoClaw. Integration choices
-are inventoried but unsupported active connectors/account routes are rejected.
+declarative Slack jobs and provisions them through NanoClaw. GitHub PR review is
+restricted to configured repositories and reports findings in Slack, with
+optional explicit conversation comments;
+unsupported active connectors/account routes are rejected.
 Codex-enabled images and a native Mac recipe worker are also present. The README
 records local checks; no live company installation has been connected.
 
-Next, add live onboarding checks and connector adapters, then extract the review
-lifecycle and add Codex execution. Build account routing and durable
-step handoffs as part of that execution boundary. Prove a Slack-requested report-only review,
-then GitHub triggers and publication. Add authorized change-to-draft-PR work and
+Next, add live onboarding checks and verify private-repository gateway access.
+Extract the review lifecycle into durable step handoffs. Then add GitHub triggers
+and publication. Add authorized change-to-draft-PR work and
 operational recovery checks. Finally integrate runner dispatch and optional Tart
 sessions. The portable Slack/GitHub product is the primary milestone; mobile
 workers are an extension.
